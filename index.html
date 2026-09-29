@@ -7,6 +7,7 @@
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+  <script src="https://cdn.jsdelivr.net/npm/html2canvas@1.4.1/dist/html2canvas.min.js"></script>
   <style>
     :root {
       --ink: #1e293b;
@@ -156,6 +157,11 @@
       padding: 18px;
     }
 
+    .export-container {
+      background: #ffffff;
+      padding: 0;
+    }
+
     .grid-wrap {
       overflow: auto;
       border-radius: var(--radius-md);
@@ -236,13 +242,14 @@
 
     .course-chip {
       width: 100%;
-      min-height: 64px;
+      flex: 1 1 0;
+      min-height: 32px;
       border: 1px solid rgba(0, 0, 0, 0.08);
       display: flex;
       flex-direction: column;
       align-items: center;
       justify-content: center;
-      padding: 6px 4px;
+      padding: 4px;
       border-radius: var(--radius-sm);
       cursor: pointer;
       color: #1e293b;
@@ -475,7 +482,25 @@
       font-weight: 700;
     }
 
-    .print-only { display: none; }
+    .print-header {
+      display: none;
+      justify-content: space-between;
+      align-items: baseline;
+      margin-bottom: 8px;
+      padding-bottom: 4px;
+    }
+
+    .print-header h1 {
+      font-size: 17px;
+      margin: 0;
+      color: var(--navy);
+    }
+
+    .print-header .meta {
+      font-size: 11px;
+      color: var(--muted);
+      font-weight: 600;
+    }
 
     @media (max-width: 1100px) {
       .layout { grid-template-columns: 1fr; }
@@ -483,26 +508,104 @@
       .pickers { max-height: none; }
     }
 
+    @page {
+      size: landscape;
+      margin: 5mm 7mm;
+    }
+
     @media print {
-      body { background: #fff; }
+      * {
+        -webkit-print-color-adjust: exact !important;
+        print-color-adjust: exact !important;
+      }
+      html, body {
+        background: #fff !important;
+        font-size: 10px;
+      }
       .no-print { display: none !important; }
-      .wrap { max-width: none; padding: 0; }
-      .planner-panel { border: 0; padding: 0; box-shadow: none; }
-      .grid-wrap { overflow: visible; border: none; }
-      .planner { min-width: 0; }
-      .grid { grid-template-columns: 145px repeat(9, 1fr); }
-      .head { font-size: 9px; padding: 6px 2px; }
-      .category-label { font-size: 9px; }
-      .category-label .req { font-size: 8px; }
-      .cell { min-height: 60px; }
-      .course-chip { min-height: 50px; font-size: 8px; }
-      .course-chip .code { font-size: 8px; }
-      .course-chip .name { font-size: 8px; }
-      .print-only { display: block; }
-      .req-panel { page-break-before: always; }
-      .req-card { break-inside: avoid; }
-      .req-grid { grid-template-columns: 1fr 1fr; }
-      .summer-grid { grid-template-columns: 1fr 1fr; }
+      .wrap {
+        max-width: 100% !important;
+        padding: 0 !important;
+        margin: 0 !important;
+      }
+      .panel {
+        border: none !important;
+        box-shadow: none !important;
+        padding: 0 !important;
+      }
+      .planner-panel {
+        border: none !important;
+        padding: 0 !important;
+      }
+      .planner-panel h2 {
+        display: none;
+      }
+      .export-container {
+        padding: 0 !important;
+      }
+      .grid-wrap {
+        overflow: visible !important;
+        border: 1px solid #cbd5e1 !important;
+        border-radius: 6px;
+      }
+      .planner {
+        min-width: 100% !important;
+        width: 100% !important;
+      }
+      .grid {
+        width: 100% !important;
+        grid-template-columns: 145px repeat(9, 1fr) !important;
+      }
+      .head {
+        font-size: 9px !important;
+        padding: 4px 2px !important;
+        min-height: 28px !important;
+        font-weight: 700;
+      }
+      .category-label {
+        font-size: 8.5px !important;
+        padding: 4px 6px !important;
+        line-height: 1.15;
+      }
+      .category-label .req {
+        font-size: 7.5px !important;
+        padding: 1px 4px !important;
+      }
+      .cell {
+        min-height: 54px !important;
+        padding: 2px !important;
+        gap: 2px !important;
+      }
+      .empty {
+        font-size: 10px !important;
+      }
+      .course-chip {
+        flex: 1 1 0 !important;
+        min-height: 23px !important;
+        padding: 1px 2px !important;
+        box-shadow: none !important;
+        border: 1px solid rgba(0, 0, 0, 0.15) !important;
+      }
+      .course-chip .code {
+        font-size: 8px !important;
+        line-height: 1.1 !important;
+      }
+      .course-chip .name {
+        display: block;
+        font-size: 7px !important;
+        line-height: 1.05 !important;
+        margin-top: 1px !important;
+      }
+      .print-header {
+        display: flex !important;
+        margin-bottom: 5px;
+      }
+      .print-header h1 {
+        font-size: 15px !important;
+      }
+      .print-header .meta {
+        font-size: 9.5px;
+      }
     }
   </style>
 </head>
@@ -517,17 +620,22 @@
       <button class="btn" id="resetBtn">Reset plan</button>
     </div>
   </div>
-  <div class="stats">
+  <div class="stats no-print">
     <div class="stat"><b id="courseCount">0 of 21</b><small>COURSES PLACED</small></div>
     <div class="stat"><b id="creditCount">0 of 61</b><small>CREDIT HOURS</small></div>
   </div>
   <div class="layout">
     <section class="panel planner-panel">
       <h2>Three-year plan</h2>
-      <div class="grid-wrap">
-        <div class="planner"><div class="grid" id="grid"></div></div>
+      <div id="exportArea" class="export-container">
+        <div class="print-header" id="exportHeader">
+          <h1>Associate of Arts, General Studies — Degree Planner</h1>
+          <div class="meta" id="printMeta">SEU at Classical Conversations · 61 credit hours · 21 courses</div>
+        </div>
+        <div class="grid-wrap">
+          <div class="planner"><div class="grid" id="grid"></div></div>
+        </div>
       </div>
-      <div class="print-only note" style="margin-top:8px">SEU at Classical Conversations · 61 credit hours · 21 courses</div>
     </section>
     <aside class="panel no-print">
       <h2>Choose your courses</h2>
@@ -660,6 +768,12 @@ function renderGrid(){
     g.appendChild(h);
   }
   for(const cat of DATA.cats){
+    let maxInRow = 1;
+    for(const slot of DATA.slots){
+      const cnt = plan.filter(x=>x.cat===cat.n && x.slot===slot).length;
+      if(cnt > maxInRow) maxInRow = cnt;
+    }
+
     const lab=document.createElement('div');
     lab.className='category-label';
     lab.style.background=catTint(cat.n);
@@ -668,9 +782,12 @@ function renderGrid(){
     for(const slot of DATA.slots){
       const cell=document.createElement('div');
       cell.className='cell';
+      if(maxInRow >= 3){
+        cell.style.minHeight = `${maxInRow * 38}px`;
+      }
       const here=plan.filter(x=>x.cat===cat.n&&x.slot===slot);
       if(here.length){
-        for(const entry of here.slice(0,4)){
+        for(const entry of here){
           const c=courseMap.get(entry.code);
           const inner=document.createElement('button');
           inner.type='button';
@@ -767,73 +884,55 @@ function renderRequirements(){
 }
 
 function render(){
-  document.getElementById('courseCount').textContent=`${plan.length} of ${DATA.totalCourses}`;
-  document.getElementById('creditCount').textContent=`${plan.reduce((a,x)=>a+courseMap.get(x.code).cr,0)} of ${DATA.totalCredits}`;
+  const placedCount = plan.length;
+  const creditSum = plan.reduce((a,x)=>a+courseMap.get(x.code).cr,0);
+  document.getElementById('courseCount').textContent=`${placedCount} of ${DATA.totalCourses}`;
+  document.getElementById('creditCount').textContent=`${creditSum} of ${DATA.totalCredits}`;
+  
+  const printMeta = document.getElementById('printMeta');
+  if (printMeta) {
+    printMeta.textContent = `SEU at Classical Conversations · ${placedCount} of ${DATA.totalCourses} courses placed · ${creditSum} of ${DATA.totalCredits} credits`;
+  }
+  
   renderGrid();
   renderPickers();
   renderCats();
   renderRequirements();
 }
 
-function png(){
-  const W=1900,H=1280,cv=document.createElement('canvas');
-  cv.width=W;cv.height=H;
-  const x=cv.getContext('2d');
-  x.fillStyle='#fff';
-  x.fillRect(0,0,W,H);
-  x.fillStyle='#0f2d4a';
-  x.font='bold 32px Arial';
-  x.fillText('Associate of Arts, General Studies — Degree Planner',45,55);
-  x.fillStyle='#64748b';
-  x.font='16px Arial';
-  x.fillText(`${plan.length} of 21 courses · ${plan.reduce((a,z)=>a+courseMap.get(z.code).cr,0)} of 61 credit hours`,45,82);
-  const left=45,top=115,labelW=220,colW=170,rowH=105;
-  x.strokeStyle='#cbd5e1';
-  x.lineWidth=1;
-  x.font='bold 12px Arial';
-  x.fillStyle='#f1f5f9';
-  x.fillRect(left,top,labelW,44);
-  x.fillStyle='#1e293b';
-  x.fillText('AAGS CATEGORY',left+9,top+27);
-  DATA.slots.forEach((s,i)=>{
-    const xx=left+labelW+i*colW;
-    x.fillStyle='#f1f5f9';
-    x.fillRect(xx,top,colW,44);
-    x.fillStyle='#1e293b';
-    x.textAlign='center';
-    x.fillText(slotLabel(s),xx+colW/2,top+27);
-    x.textAlign='left';
-  });
-  DATA.cats.forEach((cat,st)=>{
-    const yy=top+44+st*rowH;
-    x.fillStyle=catTint(cat.n);
-    x.fillRect(left,yy,labelW,rowH);
-    x.fillStyle='#0f172a';
-    x.font='bold 11px Arial';
-    x.fillText(`${cat.n}. ${cat.title}`,left+8,yy+25);
-    for(let si=0;si<9;si++){
-      const xx=left+labelW+si*colW;
-      x.strokeRect(xx,yy,colW,rowH);
-      const here=plan.filter(z=>z.cat===cat.n&&z.slot===DATA.slots[si]);
-      if(here.length){
-        const c=courseMap.get(here[0].code);
-        x.fillStyle=catTint(cat.n);
-        x.fillRect(xx+2,yy+2,colW-4,rowH-4);
-        x.fillStyle='#0f172a';
-        x.font='bold 13px Arial';
-        x.textAlign='center';
-        x.fillText(c.code,xx+colW/2,yy+38);
-        x.font='12px Arial';
-        x.fillText(c.name,xx+colW/2,yy+59);
-        x.textAlign='left';
-      }
-    }
-  });
-  x.strokeRect(left,top,labelW,44);
-  const a=document.createElement('a');
-  a.download='SEU-AAGS-planner.png';
-  a.href=cv.toDataURL('image/png');
-  a.click();
+async function png(){
+  const exportArea = document.getElementById('exportArea');
+  const exportHeader = document.getElementById('exportHeader');
+  const gridWrap = exportArea.querySelector('.grid-wrap');
+  
+  // Temporarily show export header and expand grid wrap so nothing is clipped
+  exportHeader.style.display = 'flex';
+  const originalWrapOverflow = gridWrap.style.overflow;
+  const originalWrapBorder = gridWrap.style.border;
+  gridWrap.style.overflow = 'visible';
+  gridWrap.style.border = '1px solid #cbd5e1';
+
+  try {
+    const canvas = await html2canvas(exportArea, {
+      scale: 2,
+      useCORS: true,
+      backgroundColor: '#ffffff',
+      logging: false,
+      windowWidth: 1600
+    });
+
+    const a = document.createElement('a');
+    a.download = 'SEU-AAGS-planner.png';
+    a.href = canvas.toDataURL('image/png');
+    a.click();
+  } catch(err) {
+    console.error('PNG export failed', err);
+  } finally {
+    // Reset temporary styles
+    exportHeader.style.display = '';
+    gridWrap.style.overflow = originalWrapOverflow;
+    gridWrap.style.border = originalWrapBorder;
+  }
 }
 
 document.getElementById('printBtn').addEventListener('click',()=>window.print());
